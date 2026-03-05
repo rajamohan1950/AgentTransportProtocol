@@ -1,0 +1,84 @@
+[package]
+name = "atp-workspace"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+resolver = "2"
+members = [
+    "crates/atp-proto",
+    "crates/atp-types",
+    "crates/atp-identity",
+    "crates/atp-handshake",
+    "crates/atp-context",
+    "crates/atp-routing",
+    "crates/atp-fault",
+    "crates/atp-transport",
+    "crates/atp-node",
+    "crates/atp-sim",
+    "crates/atp-bench",
+]
+exclude = [
+    "crates/atp-python",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/rajamohan-atp/agent-transport-protocol"
+
+# Root package dependencies (for integration tests)
+[dependencies]
+atp-types.workspace = true
+atp-identity.workspace = true
+atp-handshake.workspace = true
+atp-context.workspace = true
+atp-routing.workspace = true
+atp-fault.workspace = true
+atp-sim.workspace = true
+tokio.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+rand.workspace = true
+serde_json.workspace = true
+ed25519-dalek.workspace = true
+
+[workspace.dependencies]
+# Internal crates
+atp-types     = { path = "crates/atp-types" }
+atp-proto     = { path = "crates/atp-proto" }
+atp-identity  = { path = "crates/atp-identity" }
+atp-handshake = { path = "crates/atp-handshake" }
+atp-context   = { path = "crates/atp-context" }
+atp-routing   = { path = "crates/atp-routing" }
+atp-fault     = { path = "crates/atp-fault" }
+atp-transport = { path = "crates/atp-transport" }
+atp-node      = { path = "crates/atp-node" }
+atp-sim       = { path = "crates/atp-sim" }
+
+# External dependencies
+tokio         = { version = "1", features = ["full"] }
+tonic         = { version = "0.12" }
+tonic-build   = { version = "0.12" }
+prost         = { version = "0.13" }
+prost-types   = { version = "0.13" }
+serde         = { version = "1.0", features = ["derive"] }
+serde_json    = { version = "1.0" }
+uuid          = { version = "1", features = ["v4", "serde"] }
+chrono        = { version = "0.4", features = ["serde"] }
+thiserror     = { version = "2" }
+anyhow        = { version = "1.0" }
+tracing       = { version = "0.1" }
+tracing-subscriber = { version = "0.3" }
+ed25519-dalek = { version = "2", features = ["serde", "rand_core"] }
+sha2          = { version = "0.10" }
+rand          = { version = "0.8" }
+rand_distr    = { version = "0.4" }
+ndarray       = { version = "0.16" }
+clap          = { version = "4", features = ["derive"] }
+async-trait   = { version = "0.1" }
+
+[workspace.lints.rust]
+unsafe_code = "deny"

@@ -1,0 +1,22 @@
+[package]
+name = "atp-sim"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+atp-types.workspace = true
+atp-identity.workspace = true
+atp-handshake.workspace = true
+atp-context.workspace = true
+atp-routing.workspace = true
+atp-fault.workspace = true
+atp-node.workspace = true
+tokio.workspace = true
+rand.workspace = true
+rand_distr.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+async-trait.workspace = true
+tracing.workspace = true

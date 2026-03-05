@@ -1,0 +1,16 @@
+[package]
+name = "atp-routing"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+atp-types.workspace = true
+tokio.workspace = true
+async-trait.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+rand.workspace = true
+chrono.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }

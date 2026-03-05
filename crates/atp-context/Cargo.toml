@@ -1,0 +1,14 @@
+[package]
+name = "atp-context"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+atp-types.workspace = true
+ndarray.workspace = true
+async-trait.workspace = true
+sha2.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+rand.workspace = true

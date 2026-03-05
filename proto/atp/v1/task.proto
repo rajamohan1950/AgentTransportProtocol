@@ -1,0 +1,36 @@
+syntax = "proto3";
+package atp.v1;
+
+import "atp/v1/common.proto";
+import "atp/v1/context.proto";
+
+message TaskSubmit {
+  AgentId from = 1;
+  AgentId to = 2;
+  string task_id = 3;
+  TaskType task_type = 4;
+  bytes payload = 5;
+  ContextDiff context = 6;
+  string contract_id = 7;
+  Timestamp timestamp = 8;
+}
+
+message TaskAck {
+  string task_id = 1;
+  bool accepted = 2;
+  string reason = 3;
+}
+
+message TaskResult {
+  AgentId from = 1;
+  string task_id = 2;
+  double quality_self_report = 3;
+  bytes payload = 4;
+  uint64 elapsed_ms = 5;
+  double actual_cost = 6;
+  Timestamp timestamp = 7;
+}
+
+message TaskQuery {
+  string task_id = 1;
+}

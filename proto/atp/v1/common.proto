@@ -1,0 +1,38 @@
+syntax = "proto3";
+package atp.v1;
+
+message AgentId {
+  string uuid = 1;
+}
+
+message Timestamp {
+  int64 seconds = 1;
+  int32 nanos = 2;
+}
+
+enum TaskType {
+  TASK_TYPE_UNSPECIFIED = 0;
+  TASK_TYPE_CODE_GENERATION = 1;
+  TASK_TYPE_ANALYSIS = 2;
+  TASK_TYPE_CREATIVE_WRITING = 3;
+  TASK_TYPE_DATA_PROCESSING = 4;
+}
+
+message QoSConstraints {
+  double min_quality = 1;
+  uint64 max_latency_ms = 2;
+  double max_cost = 3;
+  double min_trust = 4;
+}
+
+message Embedding {
+  uint32 dimensions = 1;
+  repeated double values = 2;
+}
+
+message Capability {
+  TaskType task_type = 1;
+  double estimated_quality = 2;
+  uint64 estimated_latency_ms = 3;
+  double cost_per_task = 4;
+}

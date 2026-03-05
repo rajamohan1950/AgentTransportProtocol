@@ -1,0 +1,22 @@
+[package]
+name = "atp-bench"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "atp-bench"
+path = "src/main.rs"
+
+[dependencies]
+atp-types.workspace = true
+atp-node.workspace = true
+atp-sim.workspace = true
+tokio.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+rand.workspace = true

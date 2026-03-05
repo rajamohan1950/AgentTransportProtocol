@@ -1,0 +1,47 @@
+syntax = "proto3";
+package atp.v1;
+
+import "atp/v1/common.proto";
+
+message Heartbeat {
+  AgentId from = 1;
+  uint64 sequence = 2;
+  uint32 queue_depth = 3;
+  double load_factor = 4;
+  Timestamp timestamp = 5;
+}
+
+message HeartbeatAck {
+  uint64 sequence = 1;
+}
+
+enum CircuitState {
+  CIRCUIT_STATE_UNSPECIFIED = 0;
+  CIRCUIT_STATE_CLOSED = 1;
+  CIRCUIT_STATE_OPEN = 2;
+  CIRCUIT_STATE_HALF_OPEN = 3;
+}
+
+message CircuitBreak {
+  AgentId from = 1;
+  AgentId target = 2;
+  CircuitState state = 3;
+  uint32 failure_count = 4;
+  Timestamp timestamp = 5;
+}
+
+message CircuitBreakAck {
+  bool acknowledged = 1;
+}
+
+message Backpressure {
+  AgentId from = 1;
+  uint32 queue_depth = 2;
+  double recommended_rate = 3;
+  uint64 estimated_drain_ms = 4;
+  Timestamp timestamp = 5;
+}
+
+message BackpressureAck {
+  bool acknowledged = 1;
+}

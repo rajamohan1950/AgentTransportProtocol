@@ -226,6 +226,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "atp-sdk"
+version = "0.1.0"
+dependencies = [
+ "atp-context",
+ "atp-identity",
+ "atp-routing",
+ "atp-sim",
+ "atp-types",
+ "chrono",
+ "ed25519-dalek",
+ "rand",
+ "tokio",
+]
+
+[[package]]
 name = "atp-sim"
 version = "0.1.0"
 dependencies = [

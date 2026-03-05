@@ -1,0 +1,19 @@
+[package]
+name = "atp-sdk"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Dead-simple SDK for the Agent Transport Protocol — just call and go"
+
+[dependencies]
+atp-types     = { path = "../atp-types" }
+atp-identity  = { path = "../atp-identity" }
+atp-context   = { path = "../atp-context" }
+atp-routing   = { path = "../atp-routing" }
+atp-sim       = { path = "../atp-sim" }
+
+tokio         = { workspace = true }
+rand          = { workspace = true }
+chrono        = { workspace = true }
+ed25519-dalek = { workspace = true }

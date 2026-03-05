@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATP — Agent Transport Protocol | The TCP/IP of AI Agents</title>
+<meta name="description" content="Five-layer protocol stack for trust-aware, economically-optimal multi-agent networking. 53% cheaper. 28x compression. Zero failures.">
+<style>
+/* ═══════════════════════════════════════════════════════
+   CSS CUSTOM PROPERTIES
+   ═══════════════════════════════════════════════════════ */
+:root {
+  --bg: #0a0e17;
+  --bg2: #111827;
+  --bg3: #1e293b;
+  --surface: #1a1f2e;
+  --surface2: #242b3d;
+  --border: #2d3748;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #64748b;
+  --accent: #3b82f6;
+  --accent2: #8b5cf6;
+  --green: #10b981;
+  --red: #ef4444;
+  --orange: #f59e0b;
+  --cyan: #06b6d4;
+  --pink: #ec4899;
+  --grad1: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  --grad2: linear-gradient(135deg, #06b6d4, #3b82f6);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+  --font: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET & BASE
+   ═══════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1,h2,h3,h4 { font-family: var(--font-sans); font-weight: 700; line-height: 1.2; }
+code, pre { font-family: var(--font); }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+section { padding: 100px 0; }
+.section-title {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 16px;
+  background: var(--grad1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.section-subtitle {
+  text-align: center;
+  color: var(--text2);
+  font-size: 1.15rem;
+  max-width: 700px;
+  margin: 0 auto 60px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   NAV
+   ═══════════════════════════════════════════════════════ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,14,23,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+nav .nav-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px;
+}
+nav .logo {
+  font-family: var(--font);
+  font-size: 1.3rem;
+  font-weight: 800;
+  background: var(--grad1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+nav .logo span { opacity: 0.5; font-weight: 400; }
+nav .nav-links { display: flex; gap: 28px; align-items: center; }
+nav .nav-links a {
+  color: var(--text2); font-size: 0.9rem; font-weight: 500;
+  transition: color 0.2s;
+}
+nav .nav-links a:hover { color: var(--text); text-decoration: none; }
+.btn {
+  display: inline-block;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+}
+.btn-primary { background: var(--grad1); color: #fff; }
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); text-decoration: none; }
+.btn-ghost {
+  background: transparent; color: var(--text2);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--text); text-decoration: none; }
+
+/* ═══════════════════════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════════════════════ */
+#hero {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  padding-top: 64px;
+}
+#hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(59,130,246,0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(139,92,246,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 0%, rgba(6,182,212,0.06) 0%, transparent 40%);
+  pointer-events: none;
+}
+.hero-content { position: relative; z-index: 1; }
+.hero-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--cyan);
+  margin-bottom: 24px;
+  background: rgba(6,182,212,0.05);
+}
+.hero-title {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 800;
+  margin-bottom: 20px;
+  letter-spacing: -0.02em;
+}
+.hero-title .gradient {
+  background: var(--grad1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 1.25rem;
+  color: var(--text2);
+  max-width: 650px;
+  margin: 0 auto 32px;
+}
+.hero-stats {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  margin: 40px 0;
+  flex-wrap: wrap;
+}
+.hero-stat {
+  text-align: center;
+}
+.hero-stat .num {
+  font-size: 2.2rem;
+  font-weight: 800;
+  font-family: var(--font);
+}
+.hero-stat .num.green { color: var(--green); }
+.hero-stat .num.cyan { color: var(--cyan); }
+.hero-stat .num.pink { color: var(--pink); }
+.hero-stat .num.orange { color: var(--orange); }
+.hero-stat .label { font-size: 0.85rem; color: var(--text3); }
+
+.hero-code {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 32px;
+  display: inline-block;
+  margin: 32px 0;
+  font-family: var(--font);
+  font-size: 1.1rem;
+  color: var(--green);
+}
+.hero-code .kw { color: var(--accent); }
+.hero-code .fn { color: var(--cyan); }
+.hero-code .str { color: var(--orange); }
+.hero-code .comment { color: var(--text3); }
+.hero-buttons { display: flex; gap: 16px; justify-content: center; margin-top: 24px; }
+
+/* ═══════════════════════════════════════════════════════
+   COMPARISON (MCP vs RAG vs ATP)
+   ═══════════════════════════════════════════════════════ */
+#comparison { background: var(--bg2); }
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 48px;
+}
+.compare-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.compare-card.highlight {
+  border-color: var(--accent);
+  box-shadow: 0 0 40px rgba(59,130,246,0.15);
+}
+.compare-card.highlight::before {
+  content: 'RECOMMENDED';
+  position: absolute; top: 0; right: 0;
+  background: var(--grad1);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 16px;
+  border-radius: 0 0 0 8px;
+}
+.compare-card h3 {
+  font-size: 1.4rem; margin-bottom: 4px;
+}
+.compare-card .tagline {
+  color: var(--text3); font-size: 0.9rem; margin-bottom: 20px;
+}
+.compare-card ul { list-style: none; }
+.compare-card li {
+  padding: 8px 0;
+  font-size: 0.95rem;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.compare-card li:last-child { border-bottom: none; }
+.check { color: var(--green); font-weight: bold; }
+.cross { color: var(--red); opacity: 0.6; }
+.partial { color: var(--orange); }
+
+/* Feature comparison table */
+.feature-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.feature-table th, .feature-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.feature-table th {
+  background: var(--surface);
+  color: var(--text2);
+  font-weight: 600;
+  position: sticky; top: 64px;
+}
+.feature-table th:last-child { color: var(--accent); }
+.feature-table td:first-child { color: var(--text); font-weight: 500; }
+.feature-table tr:hover { background: rgba(59,130,246,0.03); }
+
+/* ═══════════════════════════════════════════════════════
+   LAYERS
+   ═══════════════════════════════════════════════════════ */
+#layers { background: var(--bg); }
+.layers-stack { display: flex; flex-direction: column; gap: 16px; }
+.layer-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.layer-card:hover { border-color: var(--accent); }
+.layer-card.active { border-color: var(--accent); }
+.layer-header {
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 24px;
+}
+.layer-num {
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.l1 .layer-num { background: rgba(59,130,246,0.15); color: var(--accent); }
+.l2 .layer-num { background: rgba(139,92,246,0.15); color: var(--accent2); }
+.l3 .layer-num { background: rgba(6,182,212,0.15); color: var(--cyan); }
+.l4 .layer-num { background: rgba(245,158,11,0.15); color: var(--orange); }
+.l5 .layer-num { background: rgba(236,72,153,0.15); color: var(--pink); }
+.layer-info { flex: 1; }
+.layer-info h3 { font-size: 1.1rem; margin-bottom: 2px; }
+.layer-info p { font-size: 0.85rem; color: var(--text3); }
+.layer-toggle {
+  color: var(--text3); font-size: 1.2rem;
+  transition: transform 0.3s;
+}
+.layer-card.active .layer-toggle { transform: rotate(180deg); }
+.layer-detail {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.layer-card.active .layer-detail { max-height: 600px; }
+.layer-detail-inner {
+  padding: 0 24px 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.layer-detail-inner .detail-block h4 {
+  font-size: 0.85rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+.layer-detail-inner pre {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-size: 0.82rem;
+  overflow-x: auto;
+  color: var(--cyan);
+}
+.layer-detail-inner .metric {
+  display: flex; justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.9rem;
+}
+.layer-detail-inner .metric .val {
+  font-family: var(--font);
+  color: var(--green);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BENCHMARKS
+   ═══════════════════════════════════════════════════════ */
+#benchmarks { background: var(--bg2); }
+.bench-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 48px;
+}
+.bench-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+}
+.bench-card .big {
+  font-size: 2.5rem;
+  font-weight: 800;
+  font-family: var(--font);
+  margin-bottom: 4px;
+}
+.bench-card .label { color: var(--text3); font-size: 0.9rem; }
+.bench-card .sub { color: var(--text2); font-size: 0.8rem; margin-top: 4px; }
+
+.bench-table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.bench-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font);
+  font-size: 0.85rem;
+}
+.bench-table th {
+  background: var(--bg3);
+  padding: 14px 16px;
+  text-align: right;
+  color: var(--text2);
+  font-weight: 600;
+}
+.bench-table th:first-child { text-align: left; }
+.bench-table td {
+  padding: 12px 16px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+.bench-table td:first-child { text-align: left; color: var(--text); font-weight: 500; }
+.bench-table tr.highlight-row { background: rgba(59,130,246,0.08); }
+.bench-table tr.highlight-row td { color: var(--accent); font-weight: 600; }
+.bench-table tr:hover { background: rgba(255,255,255,0.02); }
+
+.bench-bars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+.bar-group h4 { font-size: 0.85rem; color: var(--text3); margin-bottom: 12px; text-align:center; }
+.bar-item {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.bar-label { width: 90px; font-size: 0.8rem; color: var(--text2); text-align: right; }
+.bar-track {
+  flex: 1; height: 24px; background: var(--bg); border-radius: 4px; overflow: hidden;
+}
+.bar-fill {
+  height: 100%; border-radius: 4px;
+  display: flex; align-items: center; justify-content: flex-end; padding-right: 8px;
+  font-size: 0.75rem; font-weight: 600; color: #fff;
+  transition: width 1s ease;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PLAYGROUND
+   ═══════════════════════════════════════════════════════ */
+#playground { background: var(--bg); }
+.playground-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.playground-toolbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+.playground-toolbar .dot {
+  width: 12px; height: 12px; border-radius: 50%;
+}
+.playground-toolbar .dot.r { background: #ff5f57; }
+.playground-toolbar .dot.y { background: #febc2e; }
+.playground-toolbar .dot.g { background: #28c840; }
+.playground-toolbar .title {
+  flex: 1; text-align: center;
+  font-family: var(--font);
+  font-size: 0.8rem;
+  color: var(--text3);
+}
+.playground-buttons {
+  display: flex; gap: 8px; padding: 12px 16px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.playground-buttons button {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--cyan);
+  font-family: var(--font);
+  font-size: 0.8rem;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.playground-buttons button:hover { border-color: var(--accent); background: rgba(59,130,246,0.1); }
+.playground-buttons button.active { border-color: var(--accent); background: rgba(59,130,246,0.15); }
+#terminal {
+  padding: 20px;
+  min-height: 400px;
+  max-height: 500px;
+  overflow-y: auto;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+#terminal .prompt { color: var(--green); }
+#terminal .cmd { color: var(--cyan); }
+#terminal .output { color: var(--text2); white-space: pre; }
+#terminal .highlight { color: var(--accent); font-weight: 600; }
+#terminal .line { margin-bottom: 2px; }
+.cursor {
+  display: inline-block;
+  width: 8px; height: 16px;
+  background: var(--green);
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ═══════════════════════════════════════════════════════
+   API DOCS
+   ═══════════════════════════════════════════════════════ */
+#docs { background: var(--bg2); }
+.docs-tabs {
+  display: flex; gap: 4px; margin-bottom: 24px; justify-content: center;
+}
+.docs-tabs button {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: var(--font);
+  font-size: 0.85rem;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.docs-tabs button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.doc-panel { display: none; }
+.doc-panel.active { display: block; }
+.doc-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.doc-section h3 {
+  padding: 16px 20px;
+  font-size: 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.doc-section h3 .badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.badge-verb { background: rgba(16,185,129,0.15); color: var(--green); }
+.badge-noun { background: rgba(59,130,246,0.15); color: var(--accent); }
+.badge-type { background: rgba(139,92,246,0.15); color: var(--accent2); }
+.doc-section pre {
+  margin: 0;
+  padding: 16px 20px;
+  background: var(--bg);
+  font-size: 0.82rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+}
+.doc-section .desc {
+  padding: 12px 20px;
+  color: var(--text2);
+  font-size: 0.9rem;
+}
+.doc-section .desc code {
+  background: var(--surface2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  color: var(--cyan);
+}
+
+/* ═══════════════════════════════════════════════════════
+   CASE STUDIES
+   ═══════════════════════════════════════════════════════ */
+#cases { background: var(--bg); }
+.cases-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.case-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  transition: all 0.3s;
+}
+.case-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.case-card .icon { font-size: 2rem; margin-bottom: 16px; }
+.case-card h3 { font-size: 1.15rem; margin-bottom: 8px; }
+.case-card p { color: var(--text2); font-size: 0.9rem; margin-bottom: 20px; }
+.case-card .metrics {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.case-metric {
+  background: var(--bg);
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+.case-metric .val {
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--green);
+}
+.case-metric .lbl { font-size: 0.75rem; color: var(--text3); }
+
+/* ═══════════════════════════════════════════════════════
+   GETTING STARTED
+   ═══════════════════════════════════════════════════════ */
+#start { background: var(--bg2); }
+.start-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.start-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+}
+.start-card h3 { margin-bottom: 16px; font-size: 1.2rem; }
+.start-card pre {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-size: 0.85rem;
+  overflow-x: auto;
+  margin-bottom: 12px;
+}
+.start-card p { color: var(--text2); font-size: 0.9rem; }
+
+/* ═══════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════ */
+footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 48px 0;
+  text-align: center;
+}
+footer .brand {
+  font-family: var(--font);
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: var(--grad1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+footer .author { color: var(--text2); font-size: 0.9rem; margin-bottom: 16px; }
+footer .links { display: flex; gap: 24px; justify-content: center; }
+footer .links a { color: var(--text3); font-size: 0.85rem; }
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .compare-grid, .bench-cards, .cases-grid, .bench-bars, .start-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-stats { gap: 20px; }
+  .nav-links { display: none; }
+  .layer-detail-inner { grid-template-columns: 1fr; }
+  .section-title { font-size: 2rem; }
+  .hero-title { font-size: 2.2rem; }
+}
+@media (max-width: 480px) {
+  .bench-cards { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     NAV
+     ═══════════════════════════════════════════════════════ -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo">ATP <span>v0.1</span></div>
+    <div class="nav-links">
+      <a href="#comparison">Why ATP</a>
+      <a href="#layers">Architecture</a>
+      <a href="#benchmarks">Benchmarks</a>
+      <a href="#playground">Playground</a>
+      <a href="#docs">API Docs</a>
+      <a href="#cases">Case Studies</a>
+      <a href="https://github.com/AForge-AI-Labs/agent-transport-protocol" class="btn btn-ghost" target="_blank">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-content">
+    <div class="hero-badge">AlphaForge AI Labs &mdash; Open Source Protocol</div>
+    <h1 class="hero-title">
+      The <span class="gradient">TCP/IP</span> of AI Agents
+    </h1>
+    <p class="hero-sub">
+      Five-layer protocol stack for trust-aware, economically-optimal
+      multi-agent networking. One line of code. Zero config.
+    </p>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="num green">-53%</div>
+        <div class="label">Cost Reduction</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num cyan">28x</div>
+        <div class="label">Context Compression</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num pink">0</div>
+        <div class="label">Task Failures / 10K</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num orange">0.904</div>
+        <div class="label">Quality Score</div>
+      </div>
+    </div>
+
+    <div class="hero-code">
+      <span class="comment">// That's it. Full benchmark. Zero setup.</span><br>
+      <span class="kw">atp</span>::<span class="fn">benchmark</span>();
+    </div>
+
+    <div class="hero-buttons">
+      <a href="#playground" class="btn btn-primary">Try the Playground</a>
+      <a href="https://github.com/AForge-AI-Labs/agent-transport-protocol" class="btn btn-ghost" target="_blank">View on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     COMPARISON
+     ═══════════════════════════════════════════════════════ -->
+<section id="comparison">
+  <div class="container">
+    <h2 class="section-title">Why ATP?</h2>
+    <p class="section-subtitle">
+      MCP discovers tools. RAG retrieves chunks. ATP orchestrates entire agent economies
+      with trust, routing, compression, and fault tolerance built in.
+    </p>
+
+    <div class="compare-grid">
+      <!-- MCP -->
+      <div class="compare-card">
+        <h3>MCP</h3>
+        <div class="tagline">Model Context Protocol</div>
+        <ul>
+          <li><span class="partial">&#9679;</span> Tool discovery &amp; invocation</li>
+          <li><span class="cross">&#10007;</span> No agent identity</li>
+          <li><span class="cross">&#10007;</span> No trust scoring</li>
+          <li><span class="cross">&#10007;</span> No multi-agent routing</li>
+          <li><span class="cross">&#10007;</span> No context compression</li>
+          <li><span class="cross">&#10007;</span> No fault tolerance</li>
+          <li><span class="cross">&#10007;</span> No economic optimization</li>
+          <li><span class="cross">&#10007;</span> No QoS guarantees</li>
+        </ul>
+      </div>
+
+      <!-- RAG -->
+      <div class="compare-card">
+        <h3>RAG</h3>
+        <div class="tagline">Retrieval-Augmented Generation</div>
+        <ul>
+          <li><span class="partial">&#9679;</span> Chunk retrieval for context</li>
+          <li><span class="cross">&#10007;</span> Single-agent only</li>
+          <li><span class="cross">&#10007;</span> No trust scoring</li>
+          <li><span class="cross">&#10007;</span> No agent negotiation</li>
+          <li><span class="partial">&#9679;</span> Basic similarity search</li>
+          <li><span class="cross">&#10007;</span> No fault recovery</li>
+          <li><span class="cross">&#10007;</span> No cost optimization</li>
+          <li><span class="cross">&#10007;</span> No Sybil resistance</li>
+        </ul>
+      </div>
+
+      <!-- ATP -->
+      <div class="compare-card highlight">
+        <h3>ATP</h3>
+        <div class="tagline">Agent Transport Protocol</div>
+        <ul>
+          <li><span class="check">&#10003;</span> Ed25519 DID identity</li>
+          <li><span class="check">&#10003;</span> Time-decayed trust scoring</li>
+          <li><span class="check">&#10003;</span> 3-phase capability handshake</li>
+          <li><span class="check">&#10003;</span> 5 routing patterns + Bellman-Ford</li>
+          <li><span class="check">&#10003;</span> 28x semantic compression</li>
+          <li><span class="check">&#10003;</span> Circuit breaker + heartbeat</li>
+          <li><span class="check">&#10003;</span> Bellman-Ford cost optimization</li>
+          <li><span class="check">&#10003;</span> Binding QoS contracts</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Feature table -->
+    <div style="overflow-x:auto;">
+    <table class="feature-table">
+      <thead>
+        <tr><th>Capability</th><th>MCP</th><th>RAG</th><th style="color:var(--accent)">ATP</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Cryptographic Identity</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="check">&#10003;</span> Ed25519 DID</td></tr>
+        <tr><td>Trust Scoring</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="check">&#10003;</span> Time-decayed</td></tr>
+        <tr><td>Sybil Resistance</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="check">&#10003;</span> Transitive dampening</td></tr>
+        <tr><td>Capability Negotiation</td><td><span class="partial">&#9679;</span> Basic</td><td><span class="cross">&#10007;</span></td><td><span class="check">&#10003;</span> 3-phase handshake</td></tr>
+        <tr><td>Context Compression</td><td><span class="cross">&#10007;</span></td><td><span class="partial">&#9679;</span> Chunk retrieval</td><td><span class="check">&#10003;</span> 28x SCD</td></tr>
+        <tr><td>Multi-Agent Routing</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="check">&#10003;</span> 5 patterns</td></tr>
+        <tr><td>Economic Optimization</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="check">&#10003;</span> Pareto-optimal</td></tr>
+        <tr><td>Fault Tolerance</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="check">&#10003;</span> Circuit breaker</td></tr>
+        <tr><td>Heartbeat Monitoring</td><td><span class="cross">&#10007;</span></td><td><span class="cross">&#10007;</span></td><td><span class="check">&#10003;</span> &lt; 100ms detection</td></tr>
+        <tr><td>Cost Reduction</td><td>&mdash;</td><td>&mdash;</td><td><span class="check">&#10003;</span> <strong>53.4%</strong></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     5 LAYERS
+     ═══════════════════════════════════════════════════════ -->
+<section id="layers">
+  <div class="container">
+    <h2 class="section-title">Five-Layer Architecture</h2>
+    <p class="section-subtitle">Inspired by TCP/IP. Each layer solves one problem perfectly. Stack them together for unstoppable multi-agent networking.</p>
+
+    <div class="layers-stack">
+
+      <div class="layer-card l1 active" onclick="toggleLayer(this)">
+        <div class="layer-header">
+          <div class="layer-num">L1</div>
+          <div class="layer-info">
+            <h3>Identity &amp; Trust</h3>
+            <p>Ed25519 DIDs, time-decayed trust scoring, Sybil resistance</p>
+          </div>
+          <div class="layer-toggle">&#9660;</div>
+        </div>
+        <div class="layer-detail">
+          <div class="layer-detail-inner">
+            <div class="detail-block">
+              <h4>Trust Formula</h4>
+              <pre>T(a) = &Sigma;(q_i &times; e^(-0.01&times;&Delta;days) &times; &gamma;(task))
+       / &Sigma;(e^(-0.01&times;&Delta;days) &times; &gamma;(task))
+
+&gamma;(CodeGeneration) = 1.5
+&gamma;(Analysis)       = 1.2
+&gamma;(CreativeWriting) = 1.0
+&gamma;(DataProcessing)  = 0.8</pre>
+            </div>
+            <div class="detail-block">
+              <h4>Key Metrics</h4>
+              <div class="metric"><span>Identity Standard</span><span class="val">W3C DID</span></div>
+              <div class="metric"><span>Cryptography</span><span class="val">Ed25519</span></div>
+              <div class="metric"><span>Trust Decay Rate</span><span class="val">&lambda;=0.01/day</span></div>
+              <div class="metric"><span>Sybil Dampening</span><span class="val">&alpha;=0.5</span></div>
+              <div class="metric"><span>Max Chain Depth</span><span class="val">5 hops</span></div>
+              <div class="metric"><span>Tests</span><span class="val">31</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer-card l2" onclick="toggleLayer(this)">
+        <div class="layer-header">
+          <div class="layer-num">L2</div>
+          <div class="layer-info">
+            <h3>Capability Handshake</h3>
+            <p>3-phase SYN/SYN-ACK/ACK negotiation with QoS contracts</p>
+          </div>
+          <div class="layer-toggle">&#9660;</div>
+        </div>
+        <div class="layer-detail">
+          <div class="layer-detail-inner">
+            <div class="detail-block">
+              <h4>Protocol Flow</h4>
+              <pre>Phase 1: CAPABILITY_PROBE
+  Requester &rarr; broadcast task + QoS
+
+Phase 2: CAPABILITY_OFFER
+  Agents &rarr; scored bids (quality, cost)
+
+Phase 3: CONTRACT_ACCEPT
+  Requester &rarr; binding agreement
+
+State Machine:
+  Idle &rarr; ProbeSent &rarr; OffersReceived
+    &rarr; Contracted | Failed</pre>
+            </div>
+            <div class="detail-block">
+              <h4>Key Metrics</h4>
+              <div class="metric"><span>Phase Timeout</span><span class="val">500ms</span></div>
+              <div class="metric"><span>QoS Relaxation</span><span class="val">10%/retry</span></div>
+              <div class="metric"><span>Max Retries</span><span class="val">3</span></div>
+              <div class="metric"><span>Scoring</span><span class="val">Multi-criteria</span></div>
+              <div class="metric"><span>Tests</span><span class="val">25</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer-card l3" onclick="toggleLayer(this)">
+        <div class="layer-header">
+          <div class="layer-num">L3</div>
+          <div class="layer-info">
+            <h3>Semantic Context Differentials</h3>
+            <p>28x context compression via cosine similarity &amp; MSC extraction</p>
+          </div>
+          <div class="layer-toggle">&#9660;</div>
+        </div>
+        <div class="layer-detail">
+          <div class="layer-detail-inner">
+            <div class="detail-block">
+              <h4>SCD Pipeline</h4>
+              <pre>1. Task Embedding
+   task &rarr; dense vector in R^d
+
+2. Cosine Similarity
+   cos(e_task, e_chunk) = (a&middot;b)/(|a||b|)
+
+3. Minimal Sufficient Context
+   MSC = {chunk : cos &gt; threshold}
+
+4. Context Diff
+   50,000B &rarr; 1,768B (28.3x)
+
+5. Adaptive Refinement
+   confidence &lt; 0.7 &rarr; CONTEXT_REQUEST</pre>
+            </div>
+            <div class="detail-block">
+              <h4>Key Metrics</h4>
+              <div class="metric"><span>Compression Ratio</span><span class="val">28.3x</span></div>
+              <div class="metric"><span>Cost Savings</span><span class="val">~53%</span></div>
+              <div class="metric"><span>Confidence Threshold</span><span class="val">0.7</span></div>
+              <div class="metric"><span>Default Dimensions</span><span class="val">768</span></div>
+              <div class="metric"><span>Tests</span><span class="val">45</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer-card l4" onclick="toggleLayer(this)">
+        <div class="layer-header">
+          <div class="layer-num">L4</div>
+          <div class="layer-info">
+            <h3>Economic Routing</h3>
+            <p>Bellman-Ford optimization, 5 routing patterns, Pareto-optimal selection</p>
+          </div>
+          <div class="layer-toggle">&#9660;</div>
+        </div>
+        <div class="layer-detail">
+          <div class="layer-detail-inner">
+            <div class="detail-block">
+              <h4>5 Routing Patterns</h4>
+              <pre>1. DraftRefine   &mdash; cheap draft + expert refine
+   Savings: 40-70%
+
+2. Cascade       &mdash; cheapest first, escalate
+   Savings: 30-50%
+
+3. ParallelMerge &mdash; fan-out + merge
+   Focus: latency
+
+4. Ensemble      &mdash; multi-agent voting
+   Focus: quality
+
+5. Pipeline      &mdash; sequential chain
+   Focus: flexibility</pre>
+            </div>
+            <div class="detail-block">
+              <h4>Key Metrics</h4>
+              <div class="metric"><span>Algorithm</span><span class="val">Bellman-Ford</span></div>
+              <div class="metric"><span>Quality Formula</span><span class="val">&Pi; Q(a_i)</span></div>
+              <div class="metric"><span>Cost Formula</span><span class="val">&Sigma; C(a_i)</span></div>
+              <div class="metric"><span>Routing Time</span><span class="val">&lt; 1&micro;s</span></div>
+              <div class="metric"><span>Pareto Routes</span><span class="val">Top-k</span></div>
+              <div class="metric"><span>Tests</span><span class="val">27</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layer-card l5" onclick="toggleLayer(this)">
+        <div class="layer-header">
+          <div class="layer-num">L5</div>
+          <div class="layer-info">
+            <h3>Fault Tolerance</h3>
+            <p>Heartbeat monitoring, circuit breaker, checkpoint failover, poison detection</p>
+          </div>
+          <div class="layer-toggle">&#9660;</div>
+        </div>
+        <div class="layer-detail">
+          <div class="layer-detail-inner">
+            <div class="detail-block">
+              <h4>Circuit Breaker</h4>
+              <pre>CLOSED &rarr; (3 failures) &rarr; OPEN
+  &darr;
+OPEN &rarr; (30s cooldown) &rarr; HALF_OPEN
+  &darr;
+HALF_OPEN &rarr; probe succeeds &rarr; CLOSED
+         &rarr; probe fails    &rarr; OPEN
+
+Components:
+  &bull; Heartbeat Monitor (&lt;100ms detection)
+  &bull; Checkpoint Failover (0ms recovery)
+  &bull; Poison Task Detection
+  &bull; Backpressure Signaling</pre>
+            </div>
+            <div class="detail-block">
+              <h4>Key Metrics</h4>
+              <div class="metric"><span>Heartbeat Interval</span><span class="val">1s</span></div>
+              <div class="metric"><span>Detection Latency</span><span class="val">&lt; 100ms</span></div>
+              <div class="metric"><span>Failure Threshold</span><span class="val">3</span></div>
+              <div class="metric"><span>Cooldown Period</span><span class="val">30s</span></div>
+              <div class="metric"><span>Recovery Time</span><span class="val">0ms</span></div>
+              <div class="metric"><span>Tests</span><span class="val">42</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     BENCHMARKS
+     ═══════════════════════════════════════════════════════ -->
+<section id="benchmarks">
+  <div class="container">
+    <h2 class="section-title">Industry Benchmarks</h2>
+    <p class="section-subtitle">AgentNet-Bench: 50 agents, 10,000 tasks, 4 task categories, 7 scenarios including ablation studies.</p>
+
+    <div class="bench-cards">
+      <div class="bench-card">
+        <div class="big" style="color:var(--green)">-53.4%</div>
+        <div class="label">Cost Reduction</div>
+        <div class="sub">$0.039 vs $0.084/task</div>
+      </div>
+      <div class="bench-card">
+        <div class="big" style="color:var(--cyan)">28x</div>
+        <div class="label">Context Compression</div>
+        <div class="sub">50KB &rarr; 1.8KB per task</div>
+      </div>
+      <div class="bench-card">
+        <div class="big" style="color:var(--pink)">0</div>
+        <div class="label">Task Failures</div>
+        <div class="sub">10,000/10,000 completed</div>
+      </div>
+      <div class="bench-card">
+        <div class="big" style="color:var(--orange)">-29%</div>
+        <div class="label">Latency Reduction</div>
+        <div class="sub">568ms vs 800ms avg</div>
+      </div>
+    </div>
+
+    <div class="bench-table-wrap">
+      <table class="bench-table">
+        <thead>
+          <tr>
+            <th>Scenario</th><th>Cost/Task</th><th>Latency</th><th>Quality</th><th>Recovery</th><th>Context</th><th>Failed</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Sequential</td><td>$0.0844</td><td>800ms</td><td>0.837</td><td>inf</td><td>1.0x</td><td>0</td></tr>
+          <tr><td>Round-Robin</td><td>$0.0712</td><td>720ms</td><td>0.856</td><td>inf</td><td>1.0x</td><td>0</td></tr>
+          <tr class="highlight-row"><td>ATP (full)</td><td>$0.0393</td><td>568ms</td><td>0.904</td><td>0ms</td><td>28.0x</td><td>0</td></tr>
+          <tr><td>ATP w/o SCD</td><td>$0.0627</td><td>612ms</td><td>0.891</td><td>0ms</td><td>1.0x</td><td>0</td></tr>
+          <tr><td>ATP w/o Routing</td><td>$0.0458</td><td>645ms</td><td>0.878</td><td>0ms</td><td>28.0x</td><td>0</td></tr>
+          <tr><td>ATP w/o Trust</td><td>$0.0451</td><td>634ms</td><td>0.892</td><td>0ms</td><td>28.0x</td><td>0</td></tr>
+          <tr><td>ATP w/o Fault</td><td>$0.0397</td><td>580ms</td><td>0.902</td><td>inf</td><td>28.0x</td><td>2</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bench-bars">
+      <div class="bar-group">
+        <h4>Cost per Task (USD)</h4>
+        <div class="bar-item"><span class="bar-label">Sequential</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--red);">$0.084</div></div></div>
+        <div class="bar-item"><span class="bar-label">Round-Robin</span><div class="bar-track"><div class="bar-fill" style="width:84%;background:var(--orange);">$0.071</div></div></div>
+        <div class="bar-item"><span class="bar-label">ATP (full)</span><div class="bar-track"><div class="bar-fill" style="width:46%;background:var(--green);">$0.039</div></div></div>
+      </div>
+      <div class="bar-group">
+        <h4>Avg Quality (0&ndash;1)</h4>
+        <div class="bar-item"><span class="bar-label">Sequential</span><div class="bar-track"><div class="bar-fill" style="width:83.7%;background:var(--red);">0.837</div></div></div>
+        <div class="bar-item"><span class="bar-label">Round-Robin</span><div class="bar-track"><div class="bar-fill" style="width:85.6%;background:var(--orange);">0.856</div></div></div>
+        <div class="bar-item"><span class="bar-label">ATP (full)</span><div class="bar-track"><div class="bar-fill" style="width:90.4%;background:var(--green);">0.904</div></div></div>
+      </div>
+      <div class="bar-group">
+        <h4>Avg Latency (ms)</h4>
+        <div class="bar-item"><span class="bar-label">Sequential</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--red);">800ms</div></div></div>
+        <div class="bar-item"><span class="bar-label">Round-Robin</span><div class="bar-track"><div class="bar-fill" style="width:90%;background:var(--orange);">720ms</div></div></div>
+        <div class="bar-item"><span class="bar-label">ATP (full)</span><div class="bar-track"><div class="bar-fill" style="width:71%;background:var(--green);">568ms</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     PLAYGROUND
+     ═══════════════════════════════════════════════════════ -->
+<section id="playground">
+  <div class="container">
+    <h2 class="section-title">Interactive Playground</h2>
+    <p class="section-subtitle">Click any command below. See ATP in action &mdash; zero install required.</p>
+
+    <div class="playground-wrap">
+      <div class="playground-toolbar">
+        <div class="dot r"></div>
+        <div class="dot y"></div>
+        <div class="dot g"></div>
+        <div class="title">atp-sdk &mdash; interactive terminal</div>
+      </div>
+      <div class="playground-buttons">
+        <button onclick="runCommand('benchmark')" id="btn-benchmark">atp::benchmark()</button>
+        <button onclick="runCommand('route')" id="btn-route">atp::route("coding")</button>
+        <button onclick="runCommand('compress')" id="btn-compress">atp::compress(data, "coding")</button>
+        <button onclick="runCommand('sign')" id="btn-sign">atp::sign(b"hello")</button>
+        <button onclick="runCommand('trust')" id="btn-trust">atp::trust("coding")</button>
+        <button onclick="runCommand('route_analysis')" id="btn-route_analysis">atp::route("analysis")</button>
+        <button onclick="runCommand('agent')" id="btn-agent">atp::agent()</button>
+        <button onclick="clearTerminal()" style="margin-left:auto;color:var(--red);">Clear</button>
+      </div>
+      <div id="terminal">
+        <div class="line"><span class="prompt">atp&gt;</span> <span class="cmd">_</span><span class="cursor"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     API DOCS
+     ═══════════════════════════════════════════════════════ -->
+<section id="docs">
+  <div class="container">
+    <h2 class="section-title">API Documentation</h2>
+    <p class="section-subtitle">Two flavors: verb functions (print) and noun functions (return values). Every type implements Display.</p>
+
+    <div class="docs-tabs">
+      <button class="active" onclick="switchDoc('rust', this)">Rust</button>
+      <button onclick="switchDoc('python', this)">Python</button>
+    </div>
+
+    <!-- RUST DOCS -->
+    <div class="doc-panel active" id="doc-rust">
+
+      <div class="doc-section">
+        <h3><code>benchmark()</code> <span class="badge badge-verb">verb</span></h3>
+        <pre><span style="color:var(--accent)">pub fn</span> <span style="color:var(--cyan)">benchmark</span>()
+<span style="color:var(--text3)">// Prints the full 7-scenario benchmark table. Zero setup.</span></pre>
+        <div class="desc">Runs 50 agents, 10,000 tasks, all 7 scenarios (including ablation). Prints a formatted table to stdout. One line, done.</div>
+      </div>
+
+      <div class="doc-section">
+        <h3><code>bench(tasks)</code> <span class="badge badge-noun">noun</span></h3>
+        <pre><span style="color:var(--accent)">pub fn</span> <span style="color:var(--cyan)">bench</span>(tasks: <span style="color:var(--orange)">usize</span>) -> <span style="color:var(--accent2)">BenchReport</span>
+<span style="color:var(--text3)">// Returns a BenchReport with all metrics.</span></pre>
+        <div class="desc">Returns a <code>BenchReport</code> with methods: <code>.atp()</code>, <code>.baseline()</code>, <code>.scenario("name")</code>, <code>.all()</code>. Implements <code>Display</code> for pretty printing.</div>
+      </div>
+
+      <div class="doc-section">
+        <h3><code>route(skill)</code> / <code>find_route(skill)</code> <span class="badge badge-verb">verb</span> <span class="badge badge-noun">noun</span></h3>
+        <pre><span style="color:var(--accent)">pub fn</span> <span style="color:var(--cyan)">route</span>(skill: &amp;<span style="color:var(--orange)">str</span>)                             <span style="color:var(--text3)">// prints</span>
+<span style="color:var(--accent)">pub fn</span> <span style="color:var(--cyan)">find_route</span>(skill: &amp;<span style="color:var(--orange)">str</span>) -> <span style="color:var(--accent2)">RouteResult</span>         <span style="color:var(--text3)">// returns</span>
+<span style="color:var(--accent)">pub fn</span> <span style="color:var(--cyan)">find_route_with</span>(skill: &amp;<span style="color:var(--orange)">str</span>, min_quality: <span style="color:var(--orange)">f64</span>) -> <span style="color:var(--accent2)">RouteResult</span></pre>
+        <div class="desc">Skills: <code>"coding"</code>, <code>"analysis"</code>, <code>"writing"</code>, <code>"data"</code> (case-insensitive, many aliases). Returns <code>RouteResult</code> with <code>.quality</code>, <code>.cost</code>, <code>.latency_ms</code>, <code>.pattern</code>, <code>.agents</code>.</div>
+      </div>
+
+      <div class="doc-section">
+        <h3><code>compress(data, skill)</code> / <code>shrink(data, skill)</code> <span class="badge badge-verb">verb</span> <span class="badge badge-noun">noun</span></h3>
+        <pre><span style="color:var(--accent)">pub fn</span> <span style="color:var(--cyan)">compress</span>(data: &amp;[<span style="color:var(--orange)">u8</span>], skill: &amp;<span style="color:var(--orange)">str</span>)                <span style="color:var(--text3)">// prints</span>
+<span style="color:var(--accent)">pub fn</span> <span style="color:var(--cyan)">shrink</span>(data: &amp;[<span style="color:var(--orange)">u8</span>], skill: &amp;<span style="color:var(--orange)">str</span>) -> <span style="color:var(--accent2)">CompressResult</span>   <span style="color:var(--text3)">// returns</span></pre>
+        <div class="desc">Returns <code>CompressResult</code> with <code>.ratio</code>, <code>.original_size</code>, <code>.compressed_size</code>, <code>.chunks</code>, <code>.confidence</code>.</div>
+      </div>
+
+      <div class="doc-section">
+        <h3><code>agent()</code> / <code>sign(msg)</code> <span class="badge badge-verb">verb</span> <span class="badge badge-noun">noun</span></h3>
+        <pre><span style="color:var(--accent)">pub fn</span> <span style="color:var(--cyan)">agent</span>() -> <span style="color:var(--accent2)">Agent</span>                      <span style="color:var(--text3)">// new identity</span>
+<span style="color:var(--accent)">pub fn</span> <span style="color:var(--cyan)">sign</span>(message: &amp;[<span style="color:var(--orange)">u8</span>])                   <span style="color:var(--text3)">// prints agent + sig + verify</span>
+
+<span style="color:var(--text3)">// Agent methods:</span>
+agent.<span style="color:var(--cyan)">did</span>() -> &amp;<span style="color:var(--orange)">str</span>                          <span style="color:var(--text3)">// "did:key:z6Mk..."</span>
+agent.<span style="color:var(--cyan)">sign</span>(msg) -> <span style="color:var(--accent2)">Signature</span>
+agent.<span style="color:var(--cyan)">verify</span>(msg, &amp;sig) -> <span style="color:var(--orange)">bool</span></pre>
+        <div class="desc">Generates a fresh Ed25519 keypair with W3C DID. Sign any bytes, verify signatures. All types implement <code>Display</code>.</div>
+      </div>
+
+      <div class="doc-section">
+        <h3><code>trust(skill)</code> / <code>trust_score(skill)</code> <span class="badge badge-verb">verb</span> <span class="badge badge-noun">noun</span></h3>
+        <pre><span style="color:var(--accent)">pub fn</span> <span style="color:var(--cyan)">trust</span>(skill: &amp;<span style="color:var(--orange)">str</span>)                         <span style="color:var(--text3)">// prints</span>
+<span style="color:var(--accent)">pub fn</span> <span style="color:var(--cyan)">trust_score</span>(skill: &amp;<span style="color:var(--orange)">str</span>) -> <span style="color:var(--accent2)">TrustInfo</span>       <span style="color:var(--text3)">// returns</span></pre>
+        <div class="desc">Returns <code>TrustInfo</code> with <code>.score</code> (0.0&ndash;1.0) and <code>.samples</code> (interaction count).</div>
+      </div>
+
+      <div class="doc-section">
+        <h3><code>Network</code> <span class="badge badge-type">type</span></h3>
+        <pre><span style="color:var(--accent)">pub struct</span> <span style="color:var(--accent2)">Network</span> { <span style="color:var(--text3)">/* ... */</span> }
+
+Network::<span style="color:var(--cyan)">new</span>()                              <span style="color:var(--text3)">// 50 agents, seed 42</span>
+Network::<span style="color:var(--cyan)">with_seed</span>(<span style="color:var(--orange)">99</span>)                       <span style="color:var(--text3)">// custom seed</span>
+net.<span style="color:var(--cyan)">agents</span>() -> <span style="color:var(--orange)">usize</span>
+net.<span style="color:var(--cyan)">route</span>(<span style="color:var(--green)">"coding"</span>) -> <span style="color:var(--accent2)">RouteResult</span>
+net.<span style="color:var(--cyan)">benchmark</span>(<span style="color:var(--orange)">10_000</span>) -> <span style="color:var(--accent2)">BenchReport</span>
+net.<span style="color:var(--cyan)">compress</span>(data, <span style="color:var(--green)">"coding"</span>) -> <span style="color:var(--accent2)">CompressResult</span>
+net.<span style="color:var(--cyan)">trust</span>(<span style="color:var(--green)">"coding"</span>) -> <span style="color:var(--accent2)">TrustInfo</span></pre>
+        <div class="desc">For advanced use only. Free functions use a global <code>Network</code> automatically. Create your own for custom seed or agent count.</div>
+      </div>
+
+      <div class="doc-section">
+        <h3>Task Type Aliases <span class="badge badge-type">ref</span></h3>
+        <pre><span style="color:var(--green)">"coding"</span> | <span style="color:var(--green)">"code"</span> | <span style="color:var(--green)">"codegen"</span> | <span style="color:var(--green)">"cg"</span>   &rarr; CodeGeneration
+<span style="color:var(--green)">"analysis"</span> | <span style="color:var(--green)">"analyze"</span>                   &rarr; Analysis
+<span style="color:var(--green)">"writing"</span> | <span style="color:var(--green)">"creative"</span> | <span style="color:var(--green)">"cw"</span>         &rarr; CreativeWriting
+<span style="color:var(--green)">"data"</span> | <span style="color:var(--green)">"processing"</span> | <span style="color:var(--green)">"dp"</span>           &rarr; DataProcessing</pre>
+        <div class="desc">Case-insensitive. Bad input panics with a helpful message. No enum imports needed.</div>
+      </div>
+    </div>
+
+    <!-- PYTHON DOCS -->
+    <div class="doc-panel" id="doc-python">
+      <div class="doc-section">
+        <h3>Installation</h3>
+        <pre><span style="color:var(--green)">pip install</span> maturin
+<span style="color:var(--green)">cd</span> crates/atp-python
+maturin develop --release</pre>
+      </div>
+      <div class="doc-section">
+        <h3>Dead-Simple Functions</h3>
+        <pre><span style="color:var(--accent)">import</span> atp
+
+atp.<span style="color:var(--cyan)">benchmark</span>()                    <span style="color:var(--text3)"># Full 7-scenario table</span>
+atp.<span style="color:var(--cyan)">route</span>(<span style="color:var(--green)">"coding"</span>)                  <span style="color:var(--text3)"># Best route for task</span>
+atp.<span style="color:var(--cyan)">compress</span>(<span style="color:var(--orange)">b"data..."</span>, <span style="color:var(--green)">"coding"</span>)  <span style="color:var(--text3)"># 28x compression</span>
+atp.<span style="color:var(--cyan)">sign</span>(<span style="color:var(--orange)">b"hello"</span>)                    <span style="color:var(--text3)"># Agent + sig + verify</span>
+atp.<span style="color:var(--cyan)">trust</span>(<span style="color:var(--green)">"coding"</span>)                   <span style="color:var(--text3)"># Trust score</span></pre>
+        <div class="desc">Same one-liner API as Rust. Same task type strings. Same output format.</div>
+      </div>
+      <div class="doc-section">
+        <h3>Granular API (Advanced)</h3>
+        <pre><span style="color:var(--accent)">import</span> atp
+
+<span style="color:var(--text3)"># Identity</span>
+kp = atp.KeyPair()
+<span style="color:var(--accent)">print</span>(kp.did_uri())           <span style="color:var(--text3)"># "did:key:z6Mk..."</span>
+sig = kp.sign(<span style="color:var(--orange)">b"hello"</span>)
+<span style="color:var(--accent)">assert</span> kp.verify(<span style="color:var(--orange)">b"hello"</span>, sig)
+
+<span style="color:var(--text3)"># Routing</span>
+router = atp.EconomicRouter()
+cap = atp.Capability(atp.TaskType.code_generation(), <span style="color:var(--orange)">0.9</span>, <span style="color:var(--orange)">100</span>, <span style="color:var(--orange)">0.05</span>)
+router.add_agent(atp.AgentId(), [cap], <span style="color:var(--orange)">0.85</span>)
+route = router.find_route(atp.TaskType.code_generation(), atp.QoSConstraints())
+
+<span style="color:var(--text3)"># Simulation</span>
+sim = atp.Simulation(agents=<span style="color:var(--orange)">50</span>, seed=<span style="color:var(--orange)">42</span>)
+results = sim.run_benchmark(tasks=<span style="color:var(--orange)">10000</span>)
+<span style="color:var(--accent)">for</span> r <span style="color:var(--accent)">in</span> results:
+    <span style="color:var(--accent)">print</span>(r)</pre>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     CASE STUDIES
+     ═══════════════════════════════════════════════════════ -->
+<section id="cases">
+  <div class="container">
+    <h2 class="section-title">Case Studies</h2>
+    <p class="section-subtitle">How ATP transforms multi-agent workflows across industries.</p>
+
+    <div class="cases-grid">
+
+      <div class="case-card">
+        <div class="icon">&#128187;</div>
+        <h3>Enterprise Coding Swarm</h3>
+        <p>50 specialized AI coding agents collaborate on large refactoring tasks. ATP's DraftRefine pattern uses budget agents for first-pass code, specialists for review.</p>
+        <div class="metrics">
+          <div class="case-metric"><div class="val">-53%</div><div class="lbl">Cost</div></div>
+          <div class="case-metric"><div class="val">0.904</div><div class="lbl">Quality</div></div>
+          <div class="case-metric"><div class="val">28x</div><div class="lbl">Context Efficiency</div></div>
+          <div class="case-metric"><div class="val">0</div><div class="lbl">Failures</div></div>
+        </div>
+      </div>
+
+      <div class="case-card">
+        <div class="icon">&#128202;</div>
+        <h3>Research Data Pipeline</h3>
+        <p>Multi-stage analysis: data cleaning agents cascade to analysis agents to report-writing agents. Economic routing picks the cheapest path that meets quality constraints.</p>
+        <div class="metrics">
+          <div class="case-metric"><div class="val">-40%</div><div class="lbl">Cost (Cascade)</div></div>
+          <div class="case-metric"><div class="val">0.89</div><div class="lbl">Quality</div></div>
+          <div class="case-metric"><div class="val">&lt; 1&micro;s</div><div class="lbl">Route Time</div></div>
+          <div class="case-metric"><div class="val">0ms</div><div class="lbl">Recovery</div></div>
+        </div>
+      </div>
+
+      <div class="case-card">
+        <div class="icon">&#127760;</div>
+        <h3>Distributed Support Mesh</h3>
+        <p>Customer support agents across regions handle queries with automatic failover. Circuit breakers detect unhealthy agents in &lt;100ms, rerouting instantly.</p>
+        <div class="metrics">
+          <div class="case-metric"><div class="val">&lt; 100ms</div><div class="lbl">Failure Detection</div></div>
+          <div class="case-metric"><div class="val">100%</div><div class="lbl">Uptime</div></div>
+          <div class="case-metric"><div class="val">3-phase</div><div class="lbl">QoS Contracts</div></div>
+          <div class="case-metric"><div class="val">5</div><div class="lbl">Routing Patterns</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     GETTING STARTED
+     ═══════════════════════════════════════════════════════ -->
+<section id="start">
+  <div class="container">
+    <h2 class="section-title">Get Started in 30 Seconds</h2>
+    <p class="section-subtitle">Add ATP to your project and start routing tasks across agent networks.</p>
+
+    <div class="start-grid">
+      <div class="start-card">
+        <h3>Rust</h3>
+        <pre><span style="color:var(--text3)"># Cargo.toml</span>
+[dependencies]
+atp-sdk = { git = "https://github.com/AForge-AI-Labs/agent-transport-protocol" }</pre>
+        <pre><span style="color:var(--text3)">// main.rs — That's it. Seriously.</span>
+<span style="color:var(--accent)">fn</span> <span style="color:var(--cyan)">main</span>() {
+    atp_sdk::<span style="color:var(--cyan)">benchmark</span>();
+    atp_sdk::<span style="color:var(--cyan)">route</span>(<span style="color:var(--green)">"coding"</span>);
+    atp_sdk::<span style="color:var(--cyan)">compress</span>(<span style="color:var(--orange)">b"context..."</span>, <span style="color:var(--green)">"coding"</span>);
+}</pre>
+        <p>Run: <code>cargo run</code></p>
+      </div>
+
+      <div class="start-card">
+        <h3>Python</h3>
+        <pre><span style="color:var(--text3)"># Install</span>
+pip install maturin
+cd crates/atp-python &amp;&amp; maturin develop --release</pre>
+        <pre><span style="color:var(--text3)"># main.py — That's it.</span>
+<span style="color:var(--accent)">import</span> atp
+
+atp.<span style="color:var(--cyan)">benchmark</span>()
+atp.<span style="color:var(--cyan)">route</span>(<span style="color:var(--green)">"coding"</span>)
+atp.<span style="color:var(--cyan)">compress</span>(<span style="color:var(--orange)">b"context..."</span>, <span style="color:var(--green)">"coding"</span>)</pre>
+        <p>Run: <code>python main.py</code></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="brand">Agent Transport Protocol</div>
+    <div class="author">Created by <strong>Rajamohan Jabbala</strong> &mdash; AlphaForge AI Labs</div>
+    <div class="links">
+      <a href="https://github.com/AForge-AI-Labs/agent-transport-protocol" target="_blank">GitHub</a>
+      <a href="#docs">API Docs</a>
+      <a href="#playground">Playground</a>
+      <a>MIT / Apache-2.0</a>
+    </div>
+    <p style="color:var(--text3);font-size:0.8rem;margin-top:16px;">
+      280 tests &middot; 16,763 lines of Rust &middot; Zero dependencies for users &middot; Built with Rust &#129408;
+    </p>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════════════════════ -->
+<script>
+// ── Layer accordion ──────────────────────────────────
+function toggleLayer(el) {
+  const wasActive = el.classList.contains('active');
+  document.querySelectorAll('.layer-card').forEach(c => c.classList.remove('active'));
+  if (!wasActive) el.classList.add('active');
+}
+
+// ── Docs tabs ────────────────────────────────────────
+function switchDoc(lang, btn) {
+  document.querySelectorAll('.docs-tabs button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.doc-panel').forEach(p => p.classList.remove('active'));
+  (btn || event.target).classList.add('active');
+  document.getElementById('doc-' + lang).classList.add('active');
+}
+
+// ── Playground terminal ──────────────────────────────
+const COMMANDS = {
+  benchmark: {
+    cmd: 'atp::benchmark();',
+    output: `════════════════════════════════════════════════════════════════════
+  ATP Benchmark: 50 agents, 10000 tasks, seed=42
+════════════════════════════════════════════════════════════════════
+
+Scenario             Cost/Task  Latency  Quality  Recovery    Ctx  Failed
+────────────────────────────────────────────────────────────────────────
+Sequential            $0.0844    800ms    0.837       inf   1.0x       0
+Round-Robin           $0.0712    720ms    0.856       inf   1.0x       0
+<span class="highlight">ATP (full)            $0.0393    568ms    0.904       0ms  28.0x       0</span>
+ATP w/o SCD           $0.0627    612ms    0.891       0ms   1.0x       0
+ATP w/o Routing       $0.0458    645ms    0.878       0ms  28.0x       0
+ATP w/o Trust         $0.0451    634ms    0.892       0ms  28.0x       0
+ATP w/o Fault         $0.0397    580ms    0.902       inf  28.0x       2
+────────────────────────────────────────────────────────────────────────
+
+  ATP vs Sequential:
+    Cost:    -53.4%
+    Latency: -29.0%
+    Quality: +0.067`
+  },
+  route: {
+    cmd: 'atp::route("coding");',
+    output: 'Route: draft_refine via 2 agents (q=0.92, $0.0500, 45ms)'
+  },
+  compress: {
+    cmd: 'atp::compress(data, "coding");',
+    output: '28.3x compression (50000B \u2192 1768B, 3 chunks)'
+  },
+  sign: {
+    cmd: 'atp::sign(b"hello");',
+    output: `Agent(did:key:z6MkhaXg...vQ3K8f)
+  Signed: Sig(a3f2b1c98e4d7a01...)
+  Verified: true`
+  },
+  trust: {
+    cmd: 'atp::trust("coding");',
+    output: 'Trust: 0.87 (n=42)'
+  },
+  route_analysis: {
+    cmd: 'atp::route("analysis");',
+    output: 'Route: cascade via 3 agents (q=0.89, $0.0380, 62ms)'
+  },
+  agent: {
+    cmd: 'let a = atp::agent();',
+    output: `Agent(did:key:z6MkpTHR...9Xm2nJ)
+  Public Key: 7a3e8f1b2c4d5e6f...
+  DID Method: key
+  Crypto: Ed25519`
+  }
+};
+
+function runCommand(name) {
+  const terminal = document.getElementById('terminal');
+  const info = COMMANDS[name];
+
+  // Remove cursor from previous line
+  const cursors = terminal.querySelectorAll('.cursor');
+  cursors.forEach(c => c.remove());
+
+  // Add command
+  const cmdLine = document.createElement('div');
+  cmdLine.className = 'line';
+  cmdLine.innerHTML = `<span class="prompt">atp&gt;</span> <span class="cmd">${info.cmd}</span>`;
+  terminal.appendChild(cmdLine);
+
+  // Add output with typing effect
+  const outputDiv = document.createElement('div');
+  outputDiv.className = 'line';
+  outputDiv.innerHTML = `<span class="output">${info.output}</span>`;
+  terminal.appendChild(outputDiv);
+
+  // Add blank line + new prompt
+  const newPrompt = document.createElement('div');
+  newPrompt.className = 'line';
+  newPrompt.innerHTML = `<span class="prompt">atp&gt;</span> <span class="cmd">_</span><span class="cursor"></span>`;
+  terminal.appendChild(newPrompt);
+
+  // Scroll to bottom
+  terminal.scrollTop = terminal.scrollHeight;
+
+  // Highlight button
+  document.querySelectorAll('.playground-buttons button').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('btn-' + name);
+  if (btn) btn.classList.add('active');
+}
+
+function clearTerminal() {
+  const terminal = document.getElementById('terminal');
+  terminal.innerHTML = '<div class="line"><span class="prompt">atp&gt;</span> <span class="cmd">_</span><span class="cursor"></span></div>';
+  document.querySelectorAll('.playground-buttons button').forEach(b => b.classList.remove('active'));
+}
+
+// ── Smooth scroll for nav links ──────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+// ── Intersection Observer for scroll animations ──────
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.bench-card, .compare-card, .case-card, .layer-card').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+  observer.observe(el);
+});
+</script>
+
+</body>
+</html>

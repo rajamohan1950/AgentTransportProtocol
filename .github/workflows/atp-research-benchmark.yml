@@ -1,0 +1,58 @@
+name: ATP Research Benchmark
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - development
+      - development-hotfix
+
+jobs:
+  test-and-benchmark:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Show reproducibility metadata
+        run: |
+          mkdir -p artifacts
+          echo "=== REPRODUCIBILITY ===" | tee artifacts/repro.txt
+          echo "Commit: $(git rev-parse HEAD)" | tee -a artifacts/repro.txt
+          echo "Branch: ${GITHUB_REF_NAME}" | tee -a artifacts/repro.txt
+          echo "Rust: $(rustc --version)" | tee -a artifacts/repro.txt
+          echo "Cargo: $(cargo --version)" | tee -a artifacts/repro.txt
+          echo "OS: $(uname -a)" | tee -a artifacts/repro.txt
+          echo "Runner: ubuntu-latest" | tee -a artifacts/repro.txt
+          echo "CPU:" | tee -a artifacts/repro.txt
+          lscpu | tee -a artifacts/repro.txt
+
+      - name: Run cargo test workspace
+        run: |
+          cargo test --workspace 2>&1 | tee artifacts/cargo-test-workspace.txt
+
+      - name: Run ATP benchmark table
+        run: |
+          cargo run --release -p atp-bench -- --agents 50 --tasks 10000 --seed 42 \
+            2>&1 | tee artifacts/bench-table.txt
+
+      - name: Run ATP benchmark JSON
+        run: |
+          cargo run --release -p atp-bench -- --agents 50 --tasks 10000 --seed 42 --output json \
+            > artifacts/bench.json
+
+      - name: Run ATP benchmark CSV
+        run: |
+          cargo run --release -p atp-bench -- --agents 50 --tasks 10000 --seed 42 --output csv \
+            > artifacts/bench.csv
+
+      - name: Upload research artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: atp-research-artifacts
+          path: artifacts/

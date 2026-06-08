@@ -7,11 +7,16 @@
 
 <h1 align="center">Agent Transport Protocol (ATP)</h1>
 
-<h3 align="center"><em>The TCP/IP of AI Agents</em></h3>
+<h3 align="center"><em>A networking-layer protocol for AI agents, modeled on TCP/IP</em></h3>
 
 <p align="center">
-  Five-layer protocol stack for trust-aware, economically-optimal multi-agent networking.<br/>
-  One line of code. Zero config. Production-grade Rust.
+  A five-layer protocol stack exploring trust-aware, economically-optimal multi-agent networking.<br/>
+  One-line SDK. Zero config. ~37k lines of Rust, 280 tests.
+</p>
+
+<p align="center">
+  <strong>Status:</strong> research prototype. The architecture and SDK are real and tested;<br/>
+  the benchmark numbers below come from a <em>simulation harness</em>, not production LLM workloads (see <a href="#-benchmarks">Benchmarks</a>).
 </p>
 
 <p align="center">
@@ -25,15 +30,17 @@
 
 ---
 
-## Headline Numbers
+## Headline Numbers (simulated)
 
-| Metric | Value |
+> These come from ATP's own simulation harness (`atp-sim`) — synthetic agents with hash-based embeddings, not real LLM calls. They show the architecture is internally consistent and each layer contributes; they are **not** a claim about production cost or quality. Reproduce them yourself with the benchmark command below.
+
+| Metric | Value (simulated) |
 |--------|-------|
-| **Cost Reduction** | **-53.4%** vs sequential |
+| **Cost Reduction** | **-53.4%** vs sequential baseline |
 | **Context Compression** | **28x** via Semantic Context Differentials |
-| **Task Failures** | **0** across 10,000 tasks |
-| **Quality Score** | **0.904** (+8% over baselines) |
-| **Latency Reduction** | **-29.3%** vs sequential |
+| **Task Failures** | **0** across 10,000 simulated tasks |
+| **Quality Score** | **0.904** (+8% over in-sim baselines) |
+| **Latency Reduction** | **-29.3%** vs sequential baseline |
 | **Routing Decisions** | **< 1 microsecond** |
 | **Tests** | **280 passing** &bull; zero failures |
 | **Lines of Rust** | **~37,000** across 75 files |
@@ -174,7 +181,7 @@ MSC = {(chunk, score) : cosine(e_task, e_chunk) > threshold}
 
 ## Benchmarks
 
-50 agents, 10,000 tasks, seed=42. All numbers reproducible.
+50 simulated agents, 10,000 tasks, seed=42 — run inside `atp-sim`, not against live LLMs. Numbers are deterministic and reproducible from the seed; they measure the protocol's behavior under a controlled model, not real-world cost or quality. Wiring this harness to real agent backends is the top open item (see [Status](#status--whats-real)).
 
 ```
 Scenario             Cost/Task  Latency  Quality  Recovery    Ctx  Failed
@@ -293,7 +300,35 @@ Tasks are specified as simple strings. Case-insensitive with many aliases:
 | Heartbeat Monitoring | - | - | < 100ms detection |
 | QoS Contracts | - | - | Binding |
 
-ATP doesn't replace MCP or RAG — it provides the **networking layer** they lack. Think of it as the difference between an app (MCP/RAG) and the network protocol (ATP) that apps run on.
+ATP doesn't replace MCP or RAG — it aims to be the **networking layer** they lack. Think of the difference between an app (MCP/RAG) and the network protocol it would run on (ATP).
+
+> Positioning note: the comparison table is about *design scope*, not a claim that ATP is a drop-in replacement or more mature than MCP. MCP is a shipping, widely-adopted standard; ATP is an early prototype exploring an adjacent layer.
+
+---
+
+## Status — what's real
+
+Being explicit so you can calibrate before reading the code:
+
+**Real and tested today**
+- Five layers implemented as independent crates, ~37k lines of Rust, 280 passing tests, zero clippy warnings
+- One-line SDK (`atp_sdk::route("coding")`) with both print and typed-return APIs
+- Ed25519 DID identity, time-decayed trust scoring, Sybil dampening (L1)
+- 3-phase capability handshake (L2), SCD compression (L3), Bellman-Ford routing (L4), circuit-breaker fault tolerance (L5)
+- Protobuf/gRPC service *definitions* for all layers
+
+**Prototype / not production**
+- Benchmarks run in `atp-sim` with synthetic agents and hash-based embeddings — **no real LLM calls yet**
+- `atp-transport` (the actual wire protocol server/client) is largely stubbed
+- Python bindings (`atp-python`) are present but excluded from the default build
+- SCD uses hash-based embeddings as a stand-in for a real embedding model
+
+**Top open items** (contributions welcome)
+- Wire `atp-sim` to real agent backends and re-run benchmarks against live LLMs
+- Flesh out `atp-transport` into a working gRPC server/client
+- Swap hash-based embeddings for a real embedding model in L3
+
+---
 
 ---
 

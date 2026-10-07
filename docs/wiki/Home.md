@@ -57,4 +57,4 @@ Lines of Rust:      ~37,000 across 75 files
 
 ---
 
-*Created by **Rajamohan Jabbala** — AlphaForge AI Labs*
+*Created by **Rajamohan Jabbala** — CTO, Continuous Learning Systems (CLS++)*

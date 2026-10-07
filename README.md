@@ -448,7 +448,7 @@ Dual licensed under [MIT](LICENSE-MIT) and [Apache 2.0](LICENSE-APACHE) — choo
 
 ## Author
 
-**Rajamohan Jabbala** — [AlphaForge AI Labs](https://github.com/rajamohan1950)
+**Rajamohan Jabbala** — CTO, [Continuous Learning Systems (CLS++)](https://www.clsplusplus.com) · [GitHub](https://github.com/rajamohan1950)
 
 ---
 

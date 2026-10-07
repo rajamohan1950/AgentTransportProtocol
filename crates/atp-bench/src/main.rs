@@ -44,7 +44,7 @@ fn main() {
     println!("╔══════════════════════════════════════════════════════════════╗");
     println!("║           AgentNet-Bench: ATP Protocol Benchmark            ║");
     println!("║         Agent Transport Protocol v0.1.0                     ║");
-    println!("║         AlphaForge AI Labs - Rajamohan Jabbala              ║");
+    println!("║   Continuous Learning Systems (CLS++) - Rajamohan Jabbala   ║");
     println!("╚══════════════════════════════════════════════════════════════╝");
     println!();
     println!("Configuration:");

@@ -108,4 +108,4 @@ See [[Contributing]] for detailed instructions. High-priority areas: gRPC transp
 Dual MIT / Apache 2.0 — choose whichever you prefer.
 
 ### Who created ATP?
-**Rajamohan Jabbala** at AlphaForge AI Labs.
+**Rajamohan Jabbala**, CTO at Continuous Learning Systems (CLS++).

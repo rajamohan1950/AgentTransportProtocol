@@ -53,7 +53,6 @@ Lines of Rust:      ~37,000 across 75 files
 ## Links
 
 - [GitHub Repository](https://github.com/rajamohan1950/AgentTransportProtocol)
-- [Website with Interactive Playground](https://atp-website.onrender.com)
 
 ---
 
